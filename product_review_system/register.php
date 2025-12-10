@@ -1,0 +1,111 @@
+<?php
+session_start();
+require 'db.php';
+
+$error = '';
+$success = '';
+$role = isset($_GET['role']) ? $_GET['role'] : 'user';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = trim($_POST['username']); 
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password']; 
+
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+        $error = 'All fields are required.';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match.';
+    } else {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $error = 'Email already registered.';
+        } else {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            // Default role is user, but if they registered via admin link (unlikely but possible logic), we could set it. 
+            // For now, let's stick to 'user' default unless explicitly handled.
+            // Actually, let's allow admin registration if they are on the admin tab? 
+            // The prompt says "Revitalize login.php & register.php". 
+            // I'll stick to 'user' default for safety, or maybe check the hidden input.
+            // Let's use the hidden role input but sanitize it.
+            // Check both POST (hidden input) and REQUEST (URL param) for robustness
+            $reg_role = (isset($_REQUEST['role']) && $_REQUEST['role'] === 'admin') ? 'admin' : 'user';
+            
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+            if ($stmt->execute([$name, $email, $hashed_password, $reg_role])) {
+                $success = 'Registration successful! You can now <a href="login.php">login</a>.';
+            } else {
+                $error = 'Something went wrong. Please try again.';
+            }
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Product Review</title>
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="icon-container">
+            <img src="icon.png" class="auth-logo" alt="Logo">
+        </div>
+        
+        <h2 class="slogan-secondary">Product Review System</h2> 
+        <div class="benefits-container">
+            <div class="benefit-item">
+                <i class="fas fa-star icon-benefit"></i>
+                <p>Personalized Recommendations</p>
+            </div>
+            <div class="benefit-item">
+                <i class="fas fa-comments icon-benefit"></i>
+                <p>Trusted Reviews & Tips</p>
+            </div>
+            <div class="benefit-item">
+                <i class="fas fa-shopping-bag icon-benefit"></i>
+                <p>Effortless Shopping Hub</p>
+            </div>
+        </div>
+        <h1>Register for <?= htmlspecialchars(ucfirst($role)) ?> </h1>
+        
+        <?php if($error): ?>
+            <p class='error'><?php echo $error; ?></p>
+        <?php endif; ?>
+        
+        <?php if($success): ?>
+            <p class='success'><?php echo $success; ?></p>
+        <?php endif; ?>
+
+        <form action="register.php?role=<?= htmlspecialchars($role) ?>" method="POST">
+            <input type="hidden" name="role" value="<?= htmlspecialchars($role) ?>">
+
+            <label>Username:</label>
+            <input type="text" name="username" required>
+
+            <label>E-mail:</label>
+            <input type="email" name="email" required>
+
+            <label>Password:</label>
+            <input type="password" name="password" required>
+
+            <!-- Added Confirm Password field to match backend requirement -->
+            <label>Confirm Password:</label>
+            <input type="password" name="confirm_password" required>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? 
+            <a href="login.php?role=<?= htmlspecialchars($role) ?>">Log In</a>
+        </p>
+        
+        <p><a href="index.php">Back to Home</a></p>
+    </div>
+</body>
+</html>

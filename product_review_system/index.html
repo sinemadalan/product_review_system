@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Market | Ana Sayfa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ÜST İNCE KAMPANYA BANDI
+    <div class="top-strip">
+        <span>Bugüne özel: 500 TL ve üzeri alışverişe ücretsiz kargo!</span>
+        <a href="#">Detaylı İncele</a>
+    </div> -->
+
+    <!-- HEADER: LOGO + ARAMA + HESAP/SEPET -->
+    <header class="main-header">
+        <div class="logo">soft<span>market</span></div>
+
+        <div class="search-box">
+            <input type="text" placeholder="Ürün, kategori veya marka ara">
+            <button>Ara</button>
+        </div>
+
+        <div class="header-actions">
+            <div class="header-link">
+                <span class="icon">👤</span>
+                <div class="text">
+                    <small>Merhaba</small>
+                    <strong>Giriş Yap / Üye Ol</strong>
+                </div>
+            </div>
+            <div class="header-link">
+                <span class="icon">💙</span>
+                <div class="text">
+                    <small>Favorilerim</small>
+                    <strong>Listem</strong>
+                </div>
+            </div>
+            <div class="header-link cart">
+                <span class="icon">🛒</span>
+                <div class="text">
+                    <small>Sepetim</small>
+                    <strong>0 Ürün</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- KATEGORİ NAVBARI -->
+    <nav class="category-nav">
+        <a href="#">Tüm Kategoriler</a>
+        <a href="#">Elektronik</a>
+        <a href="#">Moda</a>
+        <a href="#">Süpermarket</a>
+        <a href="#">Ev & Yaşam</a>
+        <a href="#">Kozmetik</a>
+        <a href="#">Anne & Bebek</a>
+        <a href="#">Spor & Outdoor</a>
+        <a href="#">Kitap</a>
+        <a href="#">Oto & Yapı Market</a>
+    </nav>
+
+    <main>
+
+        <!-- ANA KAMPANYA BANNER -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="badge">Günün Fırsatı</div>
+                <h1>Soft ve Konforlu Alışveriş Deneyimi</h1>
+                <p>
+                    Yüzlerce kategori, binlerce ürün.  
+                    Sade, modern ve göz yormayan bir tasarımla alışverişe başla.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn primary">Fırsatları Gör</button>
+                    <button class="btn ghost">Çok Satanlar</button>
+                </div>
+            </div>
+            <div class="hero-image-placeholder">
+                <span>Kampanya Görsel Alanı</span>
+            </div>
+        </section>
+
+        <!-- YATAY KAMPANYA KARTLARI -->
+        <section class="campaign-row">
+            <div class="campaign-card">
+                <div class="tag">Elektronik</div>
+                <h3>Telefon & Laptoplarda %30’a varan indirim</h3>
+                <p>Bugüne özel sepette ek avantajlar seni bekliyor.</p>
+            </div>
+            <div class="campaign-card">
+                <div class="tag">Moda</div>
+                <h3>Yeni sezon modada soft tonlar</h3>
+                <p>3 al 2 öde fırsatlarını kaçırma.</p>
+            </div>
+            <div class="campaign-card">
+                <div class="tag">Ev & Yaşam</div>
+                <h3>Minimal ev dekor ürünlerinde fırsatlar</h3>
+                <p>2. ürüne %40 indirim.</p>
+            </div>
+        </section>
+
+        <!-- GÜNÜN FIRSATLARI -->
+        <section class="product-section">
+            <div class="section-header">
+                <h2>Günün Fırsatları</h2>
+                <a href="#">Tümünü Gör</a>
+            </div>
+
+            <div class="product-grid">
+                <article class="product-card">   <!--article ne TAM OLARAK BAK-->
+                    <div class="product-img"></div>
+                    <span class="badge-discount">%30</span>
+                    <h3>Akıllı Telefon</h3>
+                    <p class="brand">SoftBrand</p>
+                    <p class="price">₺9.999 <span class="old-price">₺12.999</span></p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <span class="badge-discount">%45</span>
+                    <h3>Bluetooth Kulaklık</h3>
+                    <p class="brand">SoundSoft</p>
+                    <p class="price">₺799 <span class="old-price">₺1.199</span></p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <span class="badge-discount">%20</span>
+                    <h3>Soft Hoodie</h3>
+                    <p class="brand">CosyWear</p>
+                    <p class="price">₺499 <span class="old-price">₺629</span></p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <span class="badge-discount">%35</span>
+                    <h3>Kahve Makinesi</h3>
+                    <p class="brand">HomeSoft</p>
+                    <p class="price">₺1.299 <span class="old-price">₺1.899</span></p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+            </div>
+        </section>
+
+        <!-- ÖNE ÇIKAN KATEGORİ / ÜRÜN ALANI -->
+        <section class="product-section">
+            <div class="section-header">
+                <h2>Öne Çıkanlar</h2>
+                <a href="#">Tümünü Gör</a>
+            </div>
+
+            <div class="product-grid">
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <h3>Dizüstü Bilgisayar</h3>
+                    <p class="brand">SoftTech</p>
+                    <p class="price">₺24.999</p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <h3>Koşu Ayakkabısı</h3>
+                    <p class="brand">RunSoft</p>
+                    <p class="price">₺1.199</p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <h3>Kitap Seti</h3>
+                    <p class="brand">SoftBooks</p>
+                    <p class="price">₺349</p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-img"></div>
+                    <h3>Ofis Koltuğu</h3>
+                    <p class="brand">OfficeSoft</p>
+                    <p class="price">₺3.499</p>
+                    <button class="btn small">Sepete Ekle</button>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER (Muhtemelen sileceğim!!!)
+    <footer class="footer">
+        <div class="footer-columns">
+            <div>
+                <h4>SoftMarket</h4>
+                <a href="#">Hakkımızda</a>
+                <a href="#">Kariyer</a>
+                <a href="#">İletişim</a>
+            </div>
+            <div>
+                <h4>Müşteri Hizmetleri</h4>
+                <a href="#">Sıkça Sorulan Sorular</a>
+                <a href="#">Teslimat & İade</a>
+                <a href="#">Güvenli Alışveriş</a>
+            </div>
+            <div>
+                <h4>Hesabım</h4>
+                <a href="#">Giriş Yap</a>
+                <a href="#">Siparişlerim</a>
+                <a href="#">Favorilerim</a>
+            </div>
+        </div>
+        <p class="footer-copy">© 2025 SoftMarket. Tüm hakları saklıdır.</p>
+    </footer> -->
+
+</body>
+</html>

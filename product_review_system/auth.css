@@ -1,0 +1,215 @@
+:root {
+    --primary: #003366;
+    --primary-dark: #002244;
+    --bg-light: #f5f5f5;
+
+    --text-dark: #444;
+    --text-input: #555;
+
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.2);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* GENEL */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    margin: 0;
+    padding: 0;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 400px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.auth-logo {
+    width: 120px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px auto;
+    object-fit: contain;
+}
+
+/* BAŞLIK VE SLOGAN */
+h1 {
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 25px;
+}
+
+.slogan-secondary {
+    text-align: center;
+    color: var(--text-dark);
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-top: -15px;
+    margin-bottom: 25px;
+    padding: 0 10px;
+}
+
+/* AVANTAJLAR / ICON BÖLÜMÜ */
+.benefits-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.benefit-item {
+    flex-basis: 30%;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.icon-benefit img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.icon-benefit {
+    font-size: 2.5em;
+    color: #fff;
+    -webkit-text-stroke: 2px var(--primary);
+    background-color: transparent;
+    margin-bottom: 8px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.icon-benefit:hover {
+    transform: scale(1.1);
+    -webkit-text-stroke: 2px var(--primary-dark);
+}
+
+/* ICON ALTI YAZI */
+.benefit-item p {
+    font-size: 0.9em;
+    color: var(--text-input);
+    line-height: 1.3;
+    margin: 0;
+}
+
+/* FORM INPUTLARI */
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+form input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* SUBMIT BUTTON */
+form button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* MESAJLAR */
+.error {
+    background-color: #f8d7da;
+    color: #842029;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+}
+
+.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+}
+
+/* ROLE BUTTONS */
+.role-buttons {
+    display: flex;
+    width: 100%;
+    margin: 0 auto 20px auto;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--primary);
+}
+
+.role-buttons a {
+    flex-grow: 1;
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 0;
+    background-color: #e6e7eb;
+    color: var(--primary);
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.role-buttons a.active {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+.role-buttons a:not(.active) {
+    border-left: 1px solid var(--primary);
+}
+
+/* ALT LINKLER */
+p {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+p a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
