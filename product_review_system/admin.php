@@ -44,7 +44,10 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Soft Market</title>
+    <title>Admin Panel | Vetta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Modal Styles (Reused) */
@@ -119,7 +122,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- HEADER (Reused) -->
     <header class="main-header">
-        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">soft<span>market</span></a></div>
+        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">Vetta</a></div>
 
         <div class="search-box">
             <form action="index.php" method="GET" style="display:flex; width:100%;">
@@ -155,29 +158,19 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </a>
                 </div>
             <?php endif; ?>
-            
-            <div class="header-link">
-                <span class="icon">💙</span>
-                <div class="text">
-                    <small>My Favorites</small>
-                    <strong>My List</strong>
-                </div>
-            </div>
         </div>
     </header>
 
     <!-- KATEGORİ NAVBARI -->
     <nav class="category-nav">
         <a href="index.php">All Categories</a>
-        <a href="index.php?q=Elektronik">Electronics</a>
-        <a href="index.php?q=Moda">Fashion</a>
-        <a href="index.php?q=Süpermarket">Supermarket</a>
-        <a href="index.php?q=Ev">Home & Living</a>
-        <a href="index.php?q=Kozmetik">Beauty</a>
-        <a href="index.php?q=Anne">Mother & Baby</a>
-        <a href="index.php?q=Spor">Sports & Outdoor</a>
-        <a href="index.php?q=Kitap">Books</a>
-        <a href="index.php?q=Oto">Auto & Home Market</a>
+        <a href="index.php?q=Supermarket">Supermarket</a>
+        <a href="index.php?q=Cosmetics">Cosmetics</a>
+        <a href="index.php?q=Baby">Baby & Mom</a>
+        <a href="index.php?q=Sports">Sports & Outdoor</a>
+        <a href="index.php?q=Books">Books</a>
+        <a href="index.php?q=Auto">Auto & DIY</a>
+        <a href="index.php?q=Home">Home & Living</a>
     </nav>
 
     <main class="admin-container">

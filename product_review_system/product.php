@@ -35,7 +35,10 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($product['name']) ?> | Soft Market</title>
+    <title><?= htmlspecialchars($product['name']) ?> | Vetta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Simple inline styles for product detail specific layout, reusing main styles where possible */
@@ -205,7 +208,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- HEADER (Reused) -->
     <header class="main-header">
-        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">soft<span>market</span></a></div>
+        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">Vetta</a></div>
         <div class="search-box">
             <form action="index.php" method="GET" style="display:flex; width:100%;">
                 <input type="text" name="q" placeholder="Search products, categories or brands">
@@ -254,7 +257,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="detail-desc">
                     <?= nl2br(htmlspecialchars($product['description'])) ?>
                 </div>
-                <p><strong>Kategori:</strong> <?= htmlspecialchars($product['category']) ?></p>
+                <p><strong>Category:</strong> <?= htmlspecialchars($product['category']) ?></p>
             </div>
         </div>
 
@@ -281,7 +284,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                         <div style="clear:both;"></div>
-                        <textarea name="comment" rows="3" placeholder="Yorumunuzu buraya yazın..." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:4px;"></textarea>
+                        <textarea name="comment" rows="3" placeholder="Write your review here..." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:4px;"></textarea>
                         <button type="submit" class="btn small">Send</button>
                     </form>
                 </div>

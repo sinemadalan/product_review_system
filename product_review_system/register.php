@@ -47,7 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Product Review</title>
+    <title>Register | Vetta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -57,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <img src="icon.png" class="auth-logo" alt="Logo">
         </div>
         
-        <h2 class="slogan-secondary">Product Review System</h2> 
+        <h2 class="slogan-secondary">Vetta</h2> 
         <div class="benefits-container">
             <div class="benefit-item">
                 <i class="fas fa-star icon-benefit"></i>

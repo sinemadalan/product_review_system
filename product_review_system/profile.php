@@ -55,7 +55,10 @@ $my_reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | Soft Market</title>
+    <title>Profile | Vetta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         .profile-container {
@@ -122,7 +125,7 @@ $my_reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- HEADER (Reused) -->
     <header class="main-header">
-        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">soft<span>market</span></a></div>
+        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">Vetta</a></div>
         <div class="search-box">
             <form action="index.php" method="GET" style="display:flex; width:100%;">
                 <input type="text" name="q" placeholder="Search for products, categories or brands">
@@ -142,13 +145,6 @@ $my_reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <a href="admin.php">Admin Panel</a>
                     <?php endif; ?>
                     <a href="logout.php">Log Out</a>
-                </div>
-            </div>
-            <div class="header-link">
-                <span class="icon">💙</span>
-                <div class="text">
-                    <small>My Favorites</small>
-                    <strong>My List</strong>
                 </div>
             </div>
         </div>
