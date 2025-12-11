@@ -4,36 +4,72 @@ require 'db.php';
 
 // Search Logic
 $search_query = isset($_GET['q']) ? trim($_GET['q']) : '';
-$sql = "SELECT * FROM products";
 $params = [];
 
 if ($search_query) {
-    $sql .= " WHERE name LIKE ? OR description LIKE ? OR category LIKE ?";
+    // Search Mode
+    $sql = "SELECT p.*, 
+            (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
+            (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
+            FROM products p 
+            WHERE p.name LIKE ? OR p.description LIKE ? OR p.category LIKE ?
+            ORDER BY p.created_at DESC";
     $params = ["%$search_query%", "%$search_query%", "%$search_query%"];
-}
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $search_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Home Page Mode
+    
+    // 1. Hero Product (Most Reviewed)
+    $hero_sql = "SELECT p.*, 
+                 (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count
+                 FROM products p 
+                 ORDER BY review_count DESC, p.created_at DESC 
+                 LIMIT 1";
+    $stmt = $pdo->query($hero_sql);
+    $hero_product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$sql .= " ORDER BY created_at DESC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 2. Top Reviewed Products
+    $top_sql = "SELECT p.*, 
+                (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
+                (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
+                FROM products p 
+                ORDER BY review_count DESC, avg_rating DESC 
+                LIMIT 4";
+    $stmt = $pdo->query($top_sql);
+    $top_reviewed_products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 3. Featured Items (Newest)
+    $featured_sql = "SELECT p.*, 
+                     (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
+                     (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
+                     FROM products p 
+                     ORDER BY p.created_at DESC 
+                     LIMIT 4";
+    $stmt = $pdo->query($featured_sql);
+    $featured_products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soft Market | Home</title>
+    <title>SoftReview | Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- HEADER: LOGO + ARAMA + HESAP/SEPET -->
+    <!-- HEADER: LOGO + SEARCH + ACCOUNT -->
     <header class="main-header">
-        <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">soft<span>market</span></a></div>
+        <div class="logo">
+            <a href="index.php" style="text-decoration:none; color:inherit;">soft<span>review</span></a>
+        </div>
 
         <div class="search-box">
             <form action="index.php" method="GET" style="display:flex; width:100%;">
-                <input type="text" name="q" placeholder="Search products, categories or brands" value="<?= htmlspecialchars($search_query) ?>">
+                <input type="text" name="q" placeholder="Search for a product, category, or brand" value="<?= htmlspecialchars($search_query) ?>">
                 <button type="submit">Search</button>
             </form>
         </div>
@@ -56,92 +92,149 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             <?php else: ?>
                 <div class="header-link">
-                    <a href="login.php" style="text-decoration:none; color:inherit; display:flex; align-items:center;">
+                    <a href="login.php" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:8px;">
                         <span class="icon">👤</span>
                         <div class="text">
                             <small>Hello</small>
-                            <strong>Login / Register</strong>
+                            <strong>Log In / Sign Up</strong>
                         </div>
                     </a>
                 </div>
             <?php endif; ?>
-            
-            <div class="header-link">
-                <span class="icon">💙</span>
-                <div class="text">
-                    <small>My Favorites</small>
-                    <strong>My List</strong>
-                </div>
-            </div>
         </div>
+
     </header>
 
-    <!-- KATEGORİ NAVBARI -->
+    <!-- CATEGORY NAVBAR -->
     <nav class="category-nav">
         <a href="index.php">All Categories</a>
-        <a href="index.php?q=Electronics">Electronics</a>
-        <a href="index.php?q=Moda">Fashion</a>
         <a href="index.php?q=Supermarket">Supermarket</a>
+        <a href="index.php?q=Cosmetics">Cosmetics</a>
+        <a href="index.php?q=Baby">Baby & Mom</a>
+        <a href="index.php?q=Sports">Sports & Outdoor</a>
+        <a href="index.php?q=Books">Books</a>
+        <a href="index.php?q=Auto">Auto & DIY</a>
         <a href="index.php?q=Home">Home & Living</a>
-        <a href="index.php?q=Beauty">Beauty</a>
-        <a href="index.php?q=Anne">Mother & Baby</a>
-        <a href="index.php?q=Sport">Sport & Outdoor</a>
-        <a href="index.php?q=Book">Book</a>
-        <a href="index.php?q=Auto">Auto & Home Market</a>
     </nav>
 
     <main>
 
-        <!-- ANA KAMPANYA BANNER -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <div class="badge">Günün Fırsatı</div>
-                <h1>Soft ve Konforlu Alışveriş Deneyimi</h1>
-                <p>
-                    Yüzlerce kategori, binlerce ürün.  
-                    Sade, modern ve göz yormayan bir tasarımla alışverişe başla.
-                </p>
-                <div class="hero-buttons">
-                    <button class="btn primary">See All</button>
-                    <button class="btn ghost">Most Popular</button>
+        <?php if ($search_query): ?>
+            <!-- SEARCH RESULTS -->
+            <section class="product-section">
+                <div class="section-header">
+                    <h2>Search Results for "<?= htmlspecialchars($search_query) ?>"</h2>
+                    <a href="index.php">View All</a>
                 </div>
-            </div>
-            <div class="hero-image-placeholder">
-                <span>Hero Image Placeholder</span>
-            </div>
-        </section>
 
-        <!-- GÜNÜN FIRSATLARI -->
-        <section class="product-section">
-            <div class="section-header">
-                <h2><?= $search_query ? 'Arama Sonuçları' : 'Günün Fırsatları' ?></h2>
-                <a href="index.php">See All</a>
-            </div>
+                <div class="product-grid">
+                    <?php if (count($search_results) > 0): ?>
+                        <?php foreach ($search_results as $product): ?>
+                            <article class="product-card">
+                                <a href="product.php?id=<?= $product['id'] ?>" style="text-decoration:none; color:inherit;">
+                                    <div class="product-img">
+                                        <?php if ($product['image_data']): ?>
+                                            <img src="data:image/jpeg;base64,<?= base64_encode($product['image_data']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+                                        <?php else: ?>
+                                            <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#999; border-radius:12px;">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <h3><?= htmlspecialchars($product['name']) ?></h3>
+                                    <p class="brand"><?= htmlspecialchars($product['category']) ?></p>
+                                    <p class="reviews">⭐ <?= number_format($product['avg_rating'], 1) ?> · <?= $product['review_count'] ?> reviews</p>
+                                    <p class="price">₺<?= number_format($product['price'], 2) ?></p>
+                                </a>
+                            </article>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No products found.</p>
+                    <?php endif; ?>
+                </div>
+            </section>
 
-            <div class="product-grid">
-                <?php if (count($products) > 0): ?>
-                    <?php foreach ($products as $product): ?>
-                        <article class="product-card">
-                            <a href="product.php?id=<?= $product['id'] ?>" style="text-decoration:none; color:inherit;">
-                                <div class="product-img">
-                                    <?php if ($product['image_data']): ?>
-                                        <img src="data:image/jpeg;base64,<?= base64_encode($product['image_data']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width:100%; height:100%; object-fit:cover;">
-                                    <?php else: ?>
-                                        <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#999;">No Image</div>
-                                    <?php endif; ?>
-                                </div>
-                                <span class="badge-discount">%10</span>
-                                <h3><?= htmlspecialchars($product['name']) ?></h3>
-                                <p class="brand"><?= htmlspecialchars($product['category']) ?></p>
-                                <p class="price">₺<?= number_format($product['price'], 2) ?></p>
-                            </a>
-                        </article>
+        <?php else: ?>
+
+            <!-- HERO: TOP REVIEWED PRODUCT OF THE DAY -->
+            <?php if ($hero_product): ?>
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="badge">Most Reviewed</div>
+                    <h1>Today's Top Reviewed Product</h1>
+                    <p>
+                        See the product that received the most reviews today and read what people really think.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="product.php?id=<?= $hero_product['id'] ?>"><button class="btn primary">Read Top Reviews</button></a>
+                        <a href="#featured"><button class="btn ghost">Browse Categories</button></a>
+                    </div>
+                </div>
+                <div class="hero-image-placeholder" style="background:none; border:none; overflow:hidden;">
+                    <?php if ($hero_product['image_data']): ?>
+                        <img src="data:image/jpeg;base64,<?= base64_encode($hero_product['image_data']) ?>" alt="<?= htmlspecialchars($hero_product['name']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">
+                    <?php else: ?>
+                        <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#999; border-radius:20px; min-height:200px;">No Image</div>
+                    <?php endif; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
+
+            <!-- TOP REVIEWED PRODUCTS SECTION -->
+            <section class="product-section">
+                <div class="section-header">
+                    <h2>Top Reviewed Products</h2>
+                    <a href="#">View All Top Reviews</a>
+                </div>
+
+                <div class="product-grid">
+                    <?php foreach ($top_reviewed_products as $product): ?>
+                    <article class="product-card">
+                        <a href="product.php?id=<?= $product['id'] ?>" style="text-decoration:none; color:inherit;">
+                            <div class="product-img">
+                                <?php if ($product['image_data']): ?>
+                                    <img src="data:image/jpeg;base64,<?= base64_encode($product['image_data']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+                                <?php else: ?>
+                                    <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#999; border-radius:12px;">No Image</div>
+                                <?php endif; ?>
+                            </div>
+                            <h3><?= htmlspecialchars($product['name']) ?></h3>
+                            <p class="brand"><?= htmlspecialchars($product['category']) ?></p>
+                            <p class="reviews">⭐ <?= number_format($product['avg_rating'], 1) ?> · <?= $product['review_count'] ?> reviews</p>
+                            <p class="price">₺<?= number_format($product['price'], 2) ?></p>
+                        </a>
+                    </article>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <p>No products found.</p>
-                <?php endif; ?>
-            </div>
-        </section>
+                </div>
+            </section>
+
+            <!-- FEATURED SECTION -->
+            <section class="product-section" id="featured">
+                <div class="section-header">
+                    <h2>Featured Items</h2>
+                    <a href="#">View All</a>
+                </div>
+
+                <div class="product-grid">
+                    <?php foreach ($featured_products as $product): ?>
+                    <article class="product-card">
+                        <a href="product.php?id=<?= $product['id'] ?>" style="text-decoration:none; color:inherit;">
+                            <div class="product-img">
+                                <?php if ($product['image_data']): ?>
+                                    <img src="data:image/jpeg;base64,<?= base64_encode($product['image_data']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+                                <?php else: ?>
+                                    <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#999; border-radius:12px;">No Image</div>
+                                <?php endif; ?>
+                            </div>
+                            <h3><?= htmlspecialchars($product['name']) ?></h3>
+                            <p class="brand"><?= htmlspecialchars($product['category']) ?></p>
+                            <p class="price">₺<?= number_format($product['price'], 2) ?></p>
+                        </a>
+                    </article>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+        <?php endif; ?>
 
     </main>
 
