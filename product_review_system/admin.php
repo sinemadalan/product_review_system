@@ -14,7 +14,7 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
     $name = trim($_POST['name']);
     $description = trim($_POST['description']);
-    $price = $_POST['price'];
+    $price = preg_replace('/[^\d.]/', '', $_POST['price']); // Sanitize price: remove anything that is not a digit or dot.
     $category = trim($_POST['category']);
     
     // Image Upload Handling
@@ -197,8 +197,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" name="category">
                 </div>
                 <div class="form-group">
-                    <label>Price (₺)</label>
-                    <input type="number" step="0.01" name="price" required>
+                    <label>Price</label>
+                    <input type="text" name="price" required>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
