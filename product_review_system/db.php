@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost:3307';
-$dbname = 'review_db';
+$dbname = 'review_db_final';
 $username = 'root';
 $password = '';
 

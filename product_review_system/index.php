@@ -3,20 +3,32 @@ session_start();
 require 'db.php';
 
 // Search Logic
+// Search Logic
 $search_query = isset($_GET['q']) ? trim($_GET['q']) : '';
+$show_all = isset($_GET['show_all']);
 $params = [];
 
-if ($search_query) {
-    // Search Mode
-    $sql = "SELECT p.*, 
-            (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
-            (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
-            FROM products p 
-            WHERE p.name LIKE ? OR p.description LIKE ? OR p.category LIKE ?
-            ORDER BY p.created_at DESC";
-    $params = ["%$search_query%", "%$search_query%", "%$search_query%"];
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+if ($search_query || $show_all) {
+    // Search or Show All Mode
+    if ($show_all) {
+        $sql = "SELECT p.*, 
+                (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
+                (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
+                FROM products p 
+                ORDER BY p.created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+    } else {
+        $sql = "SELECT p.*, 
+                (SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id) as review_count,
+                (SELECT AVG(rating) FROM reviews r WHERE r.product_id = p.id) as avg_rating
+                FROM products p 
+                WHERE p.name LIKE ? OR p.description LIKE ? OR p.category LIKE ?
+                ORDER BY p.created_at DESC";
+        $params = ["%$search_query%", "%$search_query%", "%$search_query%"];
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    }
     $search_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     // Home Page Mode
@@ -110,7 +122,7 @@ if ($search_query) {
 
     <!-- CATEGORY NAVBAR -->
     <nav class="category-nav">
-        <a href="index.php">All Categories</a>
+        <a href="index.php?show_all=1">All Categories</a>
         <a href="index.php?q=Supermarket">Supermarket</a>
         <a href="index.php?q=Cosmetics">Cosmetics</a>
         <a href="index.php?q=Baby">Baby & Mom</a>
@@ -122,12 +134,11 @@ if ($search_query) {
 
     <main>
 
-        <?php if ($search_query): ?>
+        <?php if ($search_query || $show_all): ?>
             <!-- SEARCH RESULTS -->
             <section class="product-section">
                 <div class="section-header">
-                    <h2>Search Results for "<?= htmlspecialchars($search_query) ?>"</h2>
-                    <a href="index.php">View All</a>
+                    <h2><?= $show_all ? 'All Products' : 'Search Results for "' . htmlspecialchars($search_query) . '"' ?></h2>
                 </div>
 
                 <div class="product-grid">
@@ -186,7 +197,6 @@ if ($search_query) {
             <section class="product-section">
                 <div class="section-header">
                     <h2>Top Reviewed Products</h2>
-                    <a href="#">View All Top Reviews</a>
                 </div>
 
                 <div class="product-grid">
@@ -214,7 +224,6 @@ if ($search_query) {
             <section class="product-section" id="featured">
                 <div class="section-header">
                     <h2>Featured Items</h2>
-                    <a href="#">View All</a>
                 </div>
 
                 <div class="product-grid">
