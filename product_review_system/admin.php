@@ -49,73 +49,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Modal Styles (Reused) */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.5); 
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; 
-            padding: 2rem;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            text-align: center;
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(-20px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .btn-cancel {
-            background-color: #ccc;
-            color: #333;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-cancel:hover { background-color: #bbb; }
-        .btn-delete:hover { background-color: #c0392b; }
 
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            color: #e74c3c;
-            transition: color 0.2s;
-        }
-        .action-btn:hover { color: #c0392b; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -179,9 +114,17 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <?php if ($message): ?>
-            <div style="padding: 1rem; background: #d4edda; color: #155724; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
-                <?= htmlspecialchars($message) ?>
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Notification',
+                        text: '<?= htmlspecialchars($message) ?>',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#28a745'
+                    });
+                });
+            </script>
         <?php endif; ?>
 
         <div class="admin-card">
@@ -240,7 +183,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td>₺<?= number_format($product['price'], 2) ?></td>
                             <td><?= date('d.m.Y', strtotime($product['created_at'])) ?></td>
                             <td style="text-align:center;">
-                                <button class="action-btn" onclick="openDeleteModal(<?= $product['id'] ?>)" title="Delete Product">
+                                <button class="action-btn" onclick="confirmDelete(<?= $product['id'] ?>)" title="Delete Product" style="background: none; border: none; cursor: pointer; color: #e74c3c;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                         <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
                                     </svg>
@@ -254,42 +197,40 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0;">Delete Product?</h3>
-            <p>Are you sure you want to delete this product? This will also delete all associated reviews. This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <form method="POST" action="delete_product.php" style="margin:0;">
-                    <input type="hidden" name="product_id" id="modal_product_id">
-                    <button type="submit" class="btn-delete">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Modal functions
-        var modal = document.getElementById("deleteModal");
-
-        function openDeleteModal(productId) {
-            document.getElementById('modal_product_id').value = productId;
-            modal.style.display = "block";
+        function confirmDelete(productId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this! All associated reviews will also be deleted.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create a form programmatically and submit it
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'delete_product.php';
+                    
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = 'product_id';
+                    hiddenField.value = productId;
+                    
+                    form.appendChild(hiddenField);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         }
 
-        function closeModal() {
-            modal.style.display = "none";
-        }
 
         // Close dropdown or modal when clicking outside
         window.onclick = function(event) {
             // Close Modal
-            if (event.target == modal) {
-                closeModal();
-            }
-
-            // Close Dropdown
+            // Close Dropdown (only logic left after removing modal)
             if (!event.target.closest('.user-dropdown')) {
                 var dropdowns = document.getElementsByClassName("user-dropdown-menu");
                 for (var i = 0; i < dropdowns.length; i++) {

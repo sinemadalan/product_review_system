@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="container">
@@ -78,11 +79,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h1>Register for <?= htmlspecialchars(ucfirst($role)) ?> </h1>
         
         <?php if($error): ?>
-            <p class='error'><?php echo $error; ?></p>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Registration Failed',
+                        text: '<?php echo $error; ?>',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>
         <?php endif; ?>
         
         <?php if($success): ?>
-            <p class='success'><?php echo $success; ?></p>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Registration Successful!',
+                        html: 'You can now <a href="login.php?role=<?= htmlspecialchars($role) ?>" style="color:#3085d6; font-weight:bold;">login</a>.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Go to Login'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'login.php?role=<?= htmlspecialchars($role) ?>';
+                        }
+                    });
+                });
+            </script>
         <?php endif; ?>
 
         <form action="register.php?role=<?= htmlspecialchars($role) ?>" method="POST">

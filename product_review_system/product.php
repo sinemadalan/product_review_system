@@ -147,62 +147,8 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #c0392b;
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.5); 
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; 
-            padding: 2rem;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            text-align: center;
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(-20px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .btn-cancel {
-            background-color: #ccc;
-            color: #333;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-cancel:hover { background-color: #bbb; }
-        .btn-delete:hover { background-color: #c0392b; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -285,7 +231,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div style="clear:both;"></div>
                         <textarea name="comment" rows="3" placeholder="Write your review here..." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:4px;"></textarea>
-                        <button type="submit" class="btn small">Send</button>
+                        <button type="submit" name="submit_review" class="btn small">Send</button>
                     </form>
                 </div>
             <?php else: ?>
@@ -303,7 +249,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             (isset($_SESSION['user_role']) && strtolower($_SESSION['user_role']) === 'admin') || 
                             $_SESSION['user_id'] == $review['user_id']
                         )): ?>
-                            <button type="button" class="delete-btn" title="Delete Comment" onclick="openDeleteModal(<?= $review['id'] ?>, <?= $product['id'] ?>)">
+                            <button type="button" class="delete-btn" title="Delete Comment" onclick="confirmDelete(<?= $review['id'] ?>, <?= $product['id'] ?>)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                     <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
                                 </svg>
@@ -317,44 +263,45 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0;">Delete Comment?</h3>
-            <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <form method="POST" action="delete_comment.php" style="margin:0;">
-                    <input type="hidden" name="review_id" id="modal_review_id">
-                    <input type="hidden" name="product_id" id="modal_product_id">
-                    <button type="submit" class="btn-delete">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Modal functions
-        var modal = document.getElementById("deleteModal");
+        function confirmDelete(reviewId, productId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to delete this review? This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = 'delete_comment.php';
+                    
+                    const rInput = document.createElement('input');
+                    rInput.type = 'hidden';
+                    rInput.name = 'review_id';
+                    rInput.value = reviewId;
+                    form.appendChild(rInput);
 
-        function openDeleteModal(reviewId, productId) {
-            document.getElementById('modal_review_id').value = reviewId;
-            document.getElementById('modal_product_id').value = productId;
-            modal.style.display = "block";
+                    const pInput = document.createElement('input');
+                    pInput.type = 'hidden';
+                    pInput.name = 'product_id';
+                    pInput.value = productId;
+                    form.appendChild(pInput);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         }
 
-        function closeModal() {
-            modal.style.display = "none";
-        }
 
         // Close dropdown or modal when clicking outside
         window.onclick = function(event) {
             // Close Modal
-            if (event.target == modal) {
-                closeModal();
-            }
-
-            // Close Dropdown
+            // Close Dropdown (logic simplified)
             if (!event.target.closest('.user-dropdown')) {
                 var dropdowns = document.getElementsByClassName("user-dropdown-menu");
                 for (var i = 0; i < dropdowns.length; i++) {
