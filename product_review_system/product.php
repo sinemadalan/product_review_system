@@ -1,7 +1,8 @@
 <?php
 session_start();
-require 'db.php';
+require 'db.php'; // Veritabanı bağlantısı
 
+// ID kontrolü ve ürün çekme
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$id]);
@@ -11,9 +12,25 @@ if (!$product) {
     die("Product not found.");
 }
 
-
-// Handle Review Submission
+// Handle Review Submission (Yorum Gönderme İşlemi)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review']) && isset($_SESSION['user_id'])) {
+    
+    // --- [GÜVENLİK KONTROLÜ BAŞLANGIÇ] ---
+    // Önce içeride kaç yorum var bir sayalım
+    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM reviews WHERE product_id = ?");
+    $stmtCount->execute([$id]);
+    $currentCount = $stmtCount->fetchColumn();
+
+    // Eğer sayı 10 veya daha fazlaysa işlemi iptal et (Backend Koruması)
+    if ($currentCount >= 10) {
+        echo "<script>
+            alert('Whoops! This product has reached its review limit (Max 10). No more room for more comments.');
+            window.location.href='product.php?id=$id';
+        </script>";
+        exit;
+    }
+    // --- [GÜVENLİK KONTROLÜ BİTİŞ] ---
+
     $rating = (int)$_POST['rating'];
     $comment = trim($_POST['comment']);
     
@@ -25,13 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review']) && is
     }
 }
 
-// Fetch Reviews
+// Fetch Reviews (Yorumları Listeleme)
 $stmt = $pdo->prepare("SELECT r.*, u.name as user_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC");
 $stmt->execute([$id]);
 $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +58,7 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Simple inline styles for product detail specific layout, reusing main styles where possible */
+        /* Simple inline styles for product detail specific layout */
         .product-detail-container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -51,11 +68,11 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
             gap: 3rem;
         }
         .detail-image {
-            text-align: center; /* Center the image in its container */
+            text-align: center;
         }
         .detail-image img {
             width: 100%;
-            max-width: 400px; /* Limit maximum width */
+            max-width: 400px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
@@ -146,13 +163,11 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .delete-btn:hover {
             color: #c0392b;
         }
-
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
-    <!-- HEADER (Reused) -->
     <header class="main-header">
         <div class="logo"><a href="index.php" style="text-decoration:none; color:inherit;">Vetta</a></div>
         <div class="search-box">
@@ -210,7 +225,18 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="reviews-section">
             <h2>Reviews (<?= count($reviews) ?>)</h2>
             
-            <?php if (isset($_SESSION['user_id'])): ?>
+            <?php 
+            // Yorum sayısını al
+            $reviewCount = count($reviews); 
+            ?>
+
+            <?php if ($reviewCount >= 10): ?>
+                <div style="background: #fff3cd; color: #856404; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #ffeeba; text-align: center;">
+                    <h3 style="margin-top:0;">⛔ Review Limit Reached!</h3>
+                    <p>This product has reached it's review limit (10/10 Reviews). The review section is officially closed. You can look, but you can't make new reviews.</p>
+                </div>
+
+            <?php elseif (isset($_SESSION['user_id'])): ?>
                 <div class="review-form" style="margin-bottom: 2rem; background: #f9f9f9; padding: 1.5rem; border-radius: 8px;">
                     <h3>Leave a Review</h3>
                     <form method="POST">
@@ -234,10 +260,10 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <button type="submit" name="submit_review" class="btn small">Send</button>
                     </form>
                 </div>
+
             <?php else: ?>
                 <p><a href="login.php">Login</a> to leave a review.</p>
             <?php endif; ?>
-
             <?php foreach ($reviews as $review): ?>
                 <div class="review-card">
                     <div class="review-header">
@@ -300,8 +326,6 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Close dropdown or modal when clicking outside
         window.onclick = function(event) {
-            // Close Modal
-            // Close Dropdown (logic simplified)
             if (!event.target.closest('.user-dropdown')) {
                 var dropdowns = document.getElementsByClassName("user-dropdown-menu");
                 for (var i = 0; i < dropdowns.length; i++) {
