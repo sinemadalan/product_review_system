@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php'; // Veritabanı bağlantısı
+require 'db.php'; 
 
 // ID kontrolü ve ürün çekme
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -10,6 +10,30 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
     die("Product not found.");
+}
+// Handle Helpful Action
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['mark_helpful']) && isset($_SESSION['user_id'])) {
+    $review_id = (int)$_POST['review_id'];
+    
+    // Check if user already marked this review as helpful
+    $stmtCheck = $pdo->prepare("SELECT id FROM review_interactions WHERE user_id = ? AND review_id = ? AND type = 'helpful'");
+    $stmtCheck->execute([$_SESSION['user_id'], $review_id]);
+    
+    // Only proceed if NO existing interaction found
+    if (!$stmtCheck->fetch()) {
+        try {
+            $stmtInsert = $pdo->prepare("INSERT INTO review_interactions (user_id, review_id, type) VALUES (?, ?, 'helpful')");
+            $stmtInsert->execute([$_SESSION['user_id'], $review_id]);
+            
+            $stmtUpdate = $pdo->prepare("UPDATE reviews SET helpful_votes = helpful_votes + 1 WHERE id = ?");
+            $stmtUpdate->execute([$review_id]);
+        } catch (Exception $e) {
+            // Ignore race conditions or constraint violations
+        }
+    }
+    
+    header("Location: product.php?id=$id");
+    exit;
 }
 
 // Handle Review Submission (Yorum Gönderme İşlemi)
@@ -46,6 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review']) && is
 $stmt = $pdo->prepare("SELECT r.*, u.name as user_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC");
 $stmt->execute([$id]);
 $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch User's Helpful Votes (so we can highlight them)
+$helpful_interactions = [];
+if (isset($_SESSION['user_id'])) {
+    $stmtInt = $pdo->prepare("SELECT review_id FROM review_interactions WHERE user_id = ? AND type = 'helpful' AND review_id IN (SELECT id FROM reviews WHERE product_id = ?)");
+    $stmtInt->execute([$_SESSION['user_id'], $id]);
+    $helpful_interactions = $stmtInt->fetchAll(PDO::FETCH_COLUMN); // Returns array of review_ids
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -283,7 +315,25 @@ $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </div>
                     <p><?= nl2br(htmlspecialchars($review['comment'])) ?></p>
-                    <small style="color:#999;"><?= date('d.m.Y H:i', strtotime($review['created_at'])) ?></small>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <small style="color:#999;"><?= date('d.m.Y H:i', strtotime($review['created_at'])) ?></small>
+                        
+                        <!-- Helpful Button -->
+                        <form method="POST" style="margin:0;" <?= !isset($_SESSION['user_id']) ? 'onsubmit="event.preventDefault(); window.location.href=\'login.php\';"' : '' ?>>
+                            <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                            <?php 
+                            $isHelpful = in_array($review['id'], $helpful_interactions); 
+                            $voteCount = $review['helpful_votes'] ?? 0;
+                            $canVote = isset($_SESSION['user_id']);
+                            ?>
+                            <button type="submit" name="mark_helpful" class="helpful-btn"
+                                <?= ($isHelpful) ? 'disabled' : '' ?>
+                                title="<?= $canVote ? '' : 'Please login to vote' ?>"
+                                style="background:none; border:none; cursor:pointer; font-size:0.9rem; display:flex; align-items:center; gap:5px; color:<?= $isHelpful ? '#27ae60' : '#888' ?>; font-weight:<?= $isHelpful ? '600' : 'normal' ?>;">
+                                <?= $isHelpful ? '✅' : '👍' ?> Helpful (<?= $voteCount ?>)
+                            </button>
+                        </form>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

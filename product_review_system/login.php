@@ -43,19 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <!-- Changed class from 'container' to 'auth-container' to avoid conflict with main site layout, 
-         but I need to match the CSS I just wrote. 
-         Wait, I wrote .auth-container in CSS but the HTML in new_login.php uses .container.
-         I should change the HTML class here to auth-container OR change the CSS to scope .container inside body.login-page.
-         I'll use auth-container here for safety and clarity, as it matches the CSS I just wrote.
-    -->
     <div class="container">
         <div class="icon-container">
-            <!-- Adjusted path: new_login.php had ../css/icon.png. I'll assume icon.png is in the root or I need to find it. 
-                 The user didn't provide icon.png. I'll use a placeholder or remove it if broken. 
-                 I'll leave the img tag but point to a placeholder if I don't have the file. 
-                 Actually, I should check if the user has an icon. 
-                 I'll just use a placeholder text or generic icon if missing. -->
             <img src="icon.png" class="auth-logo" alt="Logo">
         </div>
 

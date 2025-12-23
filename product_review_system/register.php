@@ -23,13 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = 'Email already registered.';
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            // Default role is user, but if they registered via admin link (unlikely but possible logic), we could set it. 
-            // For now, let's stick to 'user' default unless explicitly handled.
-            // Actually, let's allow admin registration if they are on the admin tab? 
-            // The prompt says "Revitalize login.php & register.php". 
-            // I'll stick to 'user' default for safety, or maybe check the hidden input.
-            // Let's use the hidden role input but sanitize it.
-            // Check both POST (hidden input) and REQUEST (URL param) for robustness
             $reg_role = (isset($_REQUEST['role']) && $_REQUEST['role'] === 'admin') ? 'admin' : 'user';
             
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
